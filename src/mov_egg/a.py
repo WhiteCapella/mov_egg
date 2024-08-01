@@ -11,15 +11,11 @@ def merge(load_dt="20240724"):
             'repNationCd',  #한국외국영화 유무
     ]
     df = read_df[cols]
-    
-    df_where = df[df['movieCd'] == '20247781'].copy()
-    print(df_where)
-    print(df_where.dtypes)
+    df['multiMovieYn'] = read_df.groupby(cols[:-2])['multiMovieYn'].transform('first')
+    df['repNationCd'] = read_df.groupby(cols[:-2])['repNationCd'].transform('first')
+    df = read_df.drop_duplicates()
+    print(df.head(5))
 
-    df_where['load_dt'] = df_where['load_dt'].astype('object')
-    df_where['multiMovieYn'] = df_where['multiMovieYn'].astype('object')
-    df_where['repNationCd'] = df_where['repNationCd'].astype('object') 
-    print(df_where.dtypes)
-    return df_where
+    return df
 
 merge()
