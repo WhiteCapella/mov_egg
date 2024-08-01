@@ -10,12 +10,19 @@ def merge(load_dt="20240724"):
             'multiMovieYn', #다양성영화 유무
             'repNationCd',  #한국외국영화 유무
     ]
-    df = read_df[cols]
-    df['multiMovieYn'] = read_df.groupby(cols[:-2])['multiMovieYn'].transform('first')
-    df['repNationCd'] = read_df.groupby(cols[:-2])['repNationCd'].transform('first')
-    df = read_df.drop_duplicates()
-    print(df.head(5))
+    dfs = []
+    for col in cols[-3:]:
+        read_df[col] = read_df[col].astype('object')
+    for i in range(0, len(read_df), 100):
+        #100개 단위로 작업 진행
+        df = read_df.iloc[i:i+100][cols].copy()
+        df['multiMovieYn'] = df.groupby(cols[:-2])['multiMovieYn'].transform('first')
+        df['repNationCd'] = df.groupby(cols[:-2])['repNationCd'].transform('first')
+        df = df.drop_duplicates()
+        dfs.append(df)
 
-    return df
+    df_merged = pd.concat(dfs)
+
+    return df_merged
 
 merge()
